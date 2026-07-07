@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise Conversacional 400+ | SofIA vs Comercial</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #F5F8FC;
+  --surface: #FFFFFF;
+  --surface-alt: #EDF2F9;
+  --border: #D6E0ED;
+  --text-primary: #0F1729;
+  --text-secondary: #475569;
+  --text-muted: #8494A7;
+  --accent: #1D4ED8;
+  --accent-light: #EFF6FF;
+  --green: #1E6CB5;
+  --green-light: #E8F1FB;
+  --amber: #3B82C4;
+  --amber-light: #E8F1FB;
+  --blue: #2563EB;
+  --blue-light: #EFF6FF;
+  --purple: #4F6DB5;
+  --purple-light: #EDF2FB;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(15,23,41,.06), 0 1px 2px rgba(15,23,41,.04);
+  --shadow-lg: 0 4px 12px rgba(15,23,41,.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding: 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%);
+  border-radius: var(--radius);
+  color: white;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.header .subtitle {
+  font-size: 15px;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.header .badge {
+  display: inline-block;
+  background: #2563EB;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all .2s;
+  white-space: nowrap;
+}
+
+.tab.active {
+  background: #1D4ED8;
+  color: white;
+  font-weight: 600;
+}
+
+.tab:hover:not(.active) { background: var(--surface-alt); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Grid */
+.grid { display: grid; gap: 16px; margin-bottom: 24px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.card-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.card-accent { border-left: 3px solid #1D4ED8; }
+.card-green { border-left: 3px solid #2563EB; }
+.card-amber { border-left: 3px solid #60A5FA; }
+.card-blue { border-left: 3px solid #3B82F6; }
+.card-purple { border-left: 3px solid #93C5FD; }
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+tr:hover td { background: var(--surface-alt); }
+
+/* Tags */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-red { background: #DBEAFE; color: #1E40AF; }
+.tag-green { background: #E0F2FE; color: #0369A1; }
+.tag-amber { background: #E8F1FB; color: #1D4ED8; }
+.tag-blue { background: #EFF6FF; color: #2563EB; }
+.tag-purple { background: #E0E7FF; color: #3730A3; }
+
+/* Insight boxes */
+.insight {
+  background: var(--surface-alt);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-left: 3px solid #1D4ED8;
+}
+.insight.green { border-left-color: #2563EB; }
+.insight.amber { border-left-color: #60A5FA; }
+.insight.blue { border-left-color: #93C5FD; }
+
+.insight-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.insight-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .5s;
+}
+
+/* Compare bars */
+.compare-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.compare-label {
+  width: 160px;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.compare-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.compare-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-bar-label {
+  font-size: 11px;
+  width: 80px;
+  text-align: right;
+  color: var(--text-muted);
+}
+.compare-bar {
+  flex: 1;
+  height: 16px;
+  border-radius: 4px;
+  position: relative;
+}
+.compare-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  min-width: 30px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1D4ED8;
+}
+
+.verdict-box {
+  background: linear-gradient(135deg, #0F172A, #1E3A5F);
+  color: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.verdict-box h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #60A5FA;
+}
+.verdict-box p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Análise Conversacional 400+</h1>
+  <div class="subtitle">SofIA vs Time Comercial (VendeAí) — Leads Alta Propensão — Junho 2026</div>
+  <div class="badge">590 leads analisados &bull; 100% Alta Propensão</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('overview')">Visão Geral</button>
+  <button class="tab" onclick="showTab('conversacional')">Análise Conversacional</button>
+  <button class="tab" onclick="showTab('playbook')">Sofia vs Playbook</button>
+  <button class="tab" onclick="showTab('comercial')">Time Comercial</button>
+  <button class="tab" onclick="showTab('represamento')">Represamento</button>
+  <button class="tab" onclick="showTab('oportunidades')">Oportunidades</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="overview" class="tab-content active">
+  <div class="grid grid-4">
+    <div class="card card-accent">
+      <div class="card-title">Total Leads 400+</div>
+      <div class="card-value">590</div>
+      <div class="card-detail">100% Alta Propensão</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">Ganhos</div>
+      <div class="card-value">277</div>
+      <div class="card-detail">47.0% de conversão</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-title">Não Ganhos</div>
+      <div class="card-value">313</div>
+      <div class="card-detail">53.0% — oportunidade</div>
+    </div>
+    <div class="card card-blue">
+      <div class="card-title">Sofia Converteu</div>
+      <div class="card-value">39</div>
+      <div class="card-detail">14.0% dos ganhos</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Atribuição dos 277 Ganhos</div>
+      <div class="chart-container"><canvas id="chartAtribuicao"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Atribuição Geral (328 ganhos junho)</div>
+      <div class="chart-container"><canvas id="chartAtribuicaoGeral"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid grid-3">
+    <div class="card card-accent">
+      <div class="card-title">Comercial (SF Inbound)</div>
+      <div class="card-value">110</div>
+      <div class="card-detail">39.6% dos ganhos Sofia</div>
+    </div>
+    <div class="card card-purple">
+      <div class="card-title">Self/Outros</div>
+      <div class="card-value">129</div>
+      <div class="card-detail">46.4% — LP, Admin, Dash</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-title">Sofia Direta</div>
+      <div class="card-value">39</div>
+      <div class="card-detail">14.0% — bot conduziu ao pagamento</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">Razões de Não Conversão dos 313 Leads</div>
+    <div class="chart-container" style="height: 320px;"><canvas id="chartRazoes"></canvas></div>
+  </div>
+
+  <div class="verdict-box">
+    <h3>Achado Principal</h3>
+    <p>Dos 590 leads 400+ que passaram pela Sofia, 53% não converteram. A principal razão é a <strong>falta de resposta do lead (53.4%)</strong>, seguida de <strong>timing inadequado (47.3%)</strong>. Apenas 14% dos ganhos são atribuídos diretamente à Sofia — o comercial ainda converte 39.6%. Isso revela um gap enorme: a Sofia qualifica bem (95% aderência ao formato no playbook), mas perde o lead antes de fechar. O time comercial, com áudios, ligações e abordagem humana, recupera esses leads.</p>
+  </div>
+</div>
+
+<!-- TAB 2: CONVERSACIONAL -->
+<div id="conversacional" class="tab-content">
+  <div class="section-title">Métricas Conversacionais: Ganhos vs Não Ganhos</div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Comparação de Engajamento</div>
+      <div class="chart-container"><canvas id="chartEngajamento"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Objeções Identificadas</div>
+      <div class="chart-container"><canvas id="chartObjecoes"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">Comparação Detalhada: Ganhos vs Não Ganhos</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Métrica</th><th>Ganhos (278)</th><th>Não Ganhos (313)</th><th>Delta</th><th>Insight</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Média msgs total</td><td><strong>16.1</strong></td><td>7.9</td><td><span class="tag tag-green">+104%</span></td><td>Conversas ganhas são 2x mais longas</td></tr>
+          <tr><td>Média msgs Sofia</td><td><strong>8.8</strong></td><td>5.0</td><td><span class="tag tag-green">+76%</span></td><td>Sofia mantém engajamento mais tempo</td></tr>
+          <tr><td>Média msgs Lead</td><td><strong>7.3</strong></td><td>2.9</td><td><span class="tag tag-green">+152%</span></td><td>Lead engajado = venda</td></tr>
+          <tr><td>Lead respondeu</td><td><strong>66.5%</strong></td><td>46.6%</td><td><span class="tag tag-green">+20pp</span></td><td>Taxa resposta diferencia ganho</td></tr>
+          <tr><td>Lead engajou (3+ msgs)</td><td><strong>53.2%</strong></td><td>29.4%</td><td><span class="tag tag-green">+24pp</span></td><td>Engajamento profundo = conversão</td></tr>
+          <tr><td>Link gerado</td><td><strong>24.8%</strong></td><td>1.6%</td><td><span class="tag tag-red">+23pp</span></td><td>Muitos ganhos SEM link Sofia</td></tr>
+          <tr><td>Mencionou preço</td><td><strong>43.2%</strong></td><td>23.3%</td><td><span class="tag tag-amber">+20pp</span></td><td>Chegar ao preço = sinal positivo</td></tr>
+          <tr><td>Mencionou plano</td><td><strong>28.4%</strong></td><td>18.8%</td><td><span class="tag tag-amber">+10pp</span></td><td>Discussão de plano indica avanço</td></tr>
+          <tr><td>FUP enviado</td><td><strong>12.2%</strong></td><td>0.6%</td><td><span class="tag tag-red">+12pp</span></td><td>FUP praticamente ausente nos não ganhos</td></tr>
+          <tr><td>Pediu atendente</td><td>26.6%</td><td><strong>6.1%</strong></td><td><span class="tag tag-amber">-21pp</span></td><td>Ganhos pedem mais handoff — e são atendidos</td></tr>
+          <tr><td>Mencionou delivery</td><td><strong>46.0%</strong></td><td>34.8%</td><td><span class="tag tag-blue">+11pp</span></td><td>Perfil delivery converte mais</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="insight">
+        <div class="insight-title">Padrão de Conversa Vencedora (Sofia)</div>
+        <div class="insight-body">Leads que converteram via Sofia têm em média <strong>16 msgs</strong>, fazem <strong>7+ perguntas</strong>, passam por qualificação completa (formato, volume, dor), recebem proposta com preço e link de pagamento. Respostas curtas como "Sim", "Pode", "Faz" indicam lead pronto para fechar.</div>
+      </div>
+      <div class="insight green">
+        <div class="insight-title">Perfil do Lead 400+ que Converte</div>
+        <div class="insight-body">Restaurante já em operação, foco em delivery (46%) ou misto (delivery + salão 29%), volume de 100-200+ pedidos/mês, dor clara (organização, erro em pedido, demora no WhatsApp). Responde rápido e faz perguntas objetivas sobre funcionamento e preço.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="insight">
+        <div class="insight-title">Padrão de Conversa Perdedora</div>
+        <div class="insight-body"><strong>53.4% nem respondem</strong>. Dos que respondem, a conversa morre rápido (7.9 msgs em média). Lead diz "depois", "agora não", "sem tempo" em 47.3% dos casos. A Sofia não tem estratégia eficaz para reconquistar esses leads.</div>
+      </div>
+      <div class="insight amber">
+        <div class="insight-title">Gap Crítico: FUP</div>
+        <div class="insight-body">Apenas 0.6% dos não ganhos receberam FUP da Sofia vs 12.2% dos ganhos. A cadência de follow-up é quase inexistente para leads que esfriaram. Compare: o playbook comercial prevê até 10 touchpoints em 15 dias.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PLAYBOOK -->
+<div id="playbook" class="tab-content">
+  <div class="section-title">Sofia vs Playbook de Venda Consultiva (6 Etapas)</div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">Aderência ao Playbook por Etapa — Ganhos via Sofia vs Não Ganhos</div>
+    <div class="chart-container" style="height: 350px;"><canvas id="chartPlaybook"></canvas></div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Onde a Sofia Acerta (Ganhos)</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Etapa</th><th>%</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Qualif. Volume</td><td>100%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>Fechamento (link)</td><td>100%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>Qualif. Formato</td><td>95%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>Qualif. Dor</td><td>95%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>Funcionalidades</td><td>95%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>POL</td><td>97%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>Proposta Valor</td><td>97%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+            <tr><td>Promoção</td><td>97%</td><td><span class="tag tag-green">Excelente</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Onde a Sofia Falha</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Etapa</th><th>Ganhos</th><th>Não Ganhos</th><th>Gap</th></tr></thead>
+          <tbody>
+            <tr><td>Qualif. Motivação</td><td>36%</td><td>34%</td><td><span class="tag tag-red">Fraco em ambos</span></td></tr>
+            <tr><td>Passagem Bastão</td><td>54%</td><td>14%</td><td><span class="tag tag-amber">Incompleta</span></td></tr>
+            <tr><td>Qualif. Tempo</td><td>85%</td><td>29%</td><td><span class="tag tag-amber">Perde na qualif.</span></td></tr>
+            <tr><td>Qualif. Formato</td><td>95%</td><td>36%</td><td><span class="tag tag-red">Não chega lá</span></td></tr>
+            <tr><td>Qualif. Volume</td><td>100%</td><td>26%</td><td><span class="tag tag-red">Não chega lá</span></td></tr>
+            <tr><td>Qualif. Dor</td><td>95%</td><td>27%</td><td><span class="tag tag-red">Não chega lá</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 16px; margin-bottom: 24px;">
+    <div class="card-title">Gaps Críticos: Sofia vs Playbook Comercial</div>
+    <div class="insight">
+      <div class="insight-title">1. Ausência de Multicanal</div>
+      <div class="insight-body">O playbook prevê ligação + WhatsApp + email em cadência de 15 dias. A Sofia opera apenas em texto no WhatsApp. O comercial usa <strong>45.1% de áudios/vídeos</strong> nas conversas que fecham — um diferencial impossível para a Sofia hoje.</div>
+    </div>
+    <div class="insight amber">
+      <div class="insight-title">2. Sem Prova Social Personalizada</div>
+      <div class="insight-body">O comercial envia <strong>cardápios demo reais</strong> (30.3% das conversas), vídeos demonstrativos (5.6%) e cases de sucesso do mesmo segmento. A Sofia usa cases genéricos e não consegue mostrar o produto na prática.</div>
+    </div>
+    <div class="insight blue">
+      <div class="insight-title">3. Follow-up Raso</div>
+      <div class="insight-body">O playbook define FUPs com gatilhos de <strong>prova social, urgência real, autoridade, reciprocidade e compromisso</strong>. A Sofia faz FUP genérico ("o pagamento ainda não foi concluído") — sem retomar dores, sem contextualização.</div>
+    </div>
+    <div class="insight green">
+      <div class="insight-title">4. Qualificação da Motivação (36%)</div>
+      <div class="insight-body">A Sofia raramente pergunta "O que te fez buscar a Anota agora?" — que é a pergunta que conecta emocionalmente o lead e revela urgência. O playbook lista isso como pilar 6 obrigatório.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: COMERCIAL -->
+<div id="comercial" class="tab-content">
+  <div class="section-title">Análise do Time Comercial (VendeAí) — 264 deals</div>
+
+  <div class="grid grid-4">
+    <div class="card card-green">
+      <div class="card-title">Deals WON</div>
+      <div class="card-value">219</div>
+      <div class="card-detail">82.9% taxa conversão</div>
+    </div>
+    <div class="card card-accent">
+      <div class="card-title">Deals LOST</div>
+      <div class="card-value">45</div>
+      <div class="card-detail">17.1%</div>
+    </div>
+    <div class="card card-blue">
+      <div class="card-title">Msgs/Deal (WON)</div>
+      <div class="card-value">8.8</div>
+      <div class="card-detail">exec: 4.3, lead: 4.4</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-title">Msgs/Deal (LOST)</div>
+      <div class="card-value">4.9</div>
+      <div class="card-detail">exec: 2.3, lead: 2.5</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Técnicas do Time Comercial</div>
+      <div class="chart-container"><canvas id="chartTecnicas"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tipos de Conteúdo nos Ganhos</div>
+      <div class="chart-container"><canvas id="chartTipos"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">O que o Comercial faz que a Sofia não faz</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Técnica</th><th>Comercial</th><th>Sofia</th><th>Impacto</th></tr></thead>
+        <tbody>
+          <tr><td>Áudios/Vídeos personalizados</td><td><span class="tag tag-green">45.1%</span></td><td><span class="tag tag-red">0%</span></td><td>Humaniza, gera confiança, explica melhor</td></tr>
+          <tr><td>Demo com cardápio real</td><td><span class="tag tag-green">30.3%</span></td><td><span class="tag tag-red">0%</span></td><td>Lead vê o produto funcionando</td></tr>
+          <tr><td>Ligação telefônica</td><td><span class="tag tag-green">7.6%</span></td><td><span class="tag tag-red">0%</span></td><td>Resolução rápida de dúvidas</td></tr>
+          <tr><td>Imagens explicativas</td><td><span class="tag tag-green">4.4%</span></td><td><span class="tag tag-red">0%</span></td><td>Visual ajuda no entendimento</td></tr>
+          <tr><td>Prova social (cases)</td><td><span class="tag tag-green">15.5%</span></td><td><span class="tag tag-amber">Genérico</span></td><td>Case do mesmo segmento convence</td></tr>
+          <tr><td>Ativação/Primeiros pedidos</td><td><span class="tag tag-green">10.2%</span></td><td><span class="tag tag-amber">Parcial</span></td><td>Alinha expectativas pós-venda</td></tr>
+          <tr><td>Cashback/POL destaque</td><td><span class="tag tag-green">6.4%</span></td><td><span class="tag tag-amber">Menciona</span></td><td>Diferencial financeiro</td></tr>
+          <tr><td>Mensagem de ativação</td><td><span class="tag tag-green">58.4%</span></td><td><span class="tag tag-red">0%</span></td><td>Continuidade pós-venda</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">Temas Mais Abordados pelo Executivo (WON)</div>
+    <div class="chart-container" style="height: 300px;"><canvas id="chartTemas"></canvas></div>
+  </div>
+</div>
+
+<!-- TAB 5: REPRESAMENTO -->
+<div id="represamento" class="tab-content">
+  <div class="section-title">Faz sentido represar mais os 400+ na Sofia?</div>
+
+  <div class="verdict-box">
+    <h3>Veredicto: SIM, com ressalvas importantes</h3>
+    <p>Represar mais os 400+ faz sentido porque a Sofia qualifica bem e o volume de leads sem resposta (53.4%) indica que muitos leads precisam de mais tempo e touchpoints antes de serem encaminhados ao comercial. Porém, a Sofia precisa de melhorias significativas para aproveitar esse represamento.</p>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title" style="color: #1D4ED8;">Argumentos A FAVOR do represamento</div>
+      <div class="insight green">
+        <div class="insight-title">1. Alto volume sem resposta (53.4%)</div>
+        <div class="insight-body">167 de 313 não ganhos nunca responderam. Mais tempo com a Sofia (FUPs melhores, horários variados, abordagens diferentes) pode resgatar parte desses leads antes de mandá-los ao comercial.</div>
+      </div>
+      <div class="insight green">
+        <div class="insight-title">2. Leads que engajam convertem bem</div>
+        <div class="insight-body">Quando o lead engaja (3+ msgs), a taxa de conversão da Sofia é comparável. O problema é que o funil perde muita gente no topo — resolver isso com represamento inteligente aumentaria a base de leads qualificados.</div>
+      </div>
+      <div class="insight green">
+        <div class="insight-title">3. 46.4% convertem por Self</div>
+        <div class="insight-body">Quase metade dos ganhos que passaram pela Sofia convertem depois por canais self (LP, Admin). A Sofia planta a semente — mais tempo com ela pode amadurecer mais leads para conversão self, sem custo de executivo.</div>
+      </div>
+      <div class="insight green">
+        <div class="insight-title">4. Custo-benefício</div>
+        <div class="insight-body">Cada lead no comercial custa tempo de executivo. Se a Sofia puder converter 5-10% a mais sozinha (hoje são 14%), o ROI é muito positivo. 400+ retêm bem — cada conversão extra tem alto LTV.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color: #60A5FA;">Argumentos CONTRA (riscos)</div>
+      <div class="insight">
+        <div class="insight-title">1. Tempo mata conversão</div>
+        <div class="insight-body">47.3% dos não ganhos citam "depois" ou "sem tempo". Lead quente esfria rápido. Se represar demais sem melhorar o conversacional, o lead pode ir para concorrente ou perder interesse.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-title">2. Sofia não tem multicanal</div>
+        <div class="insight-body">O comercial usa áudio (45%), ligação (7.6%), vídeo, imagem. A Sofia só tem texto. Para leads complexos (400+, alta operação), texto puro pode ser insuficiente.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-title">3. 6.1% pedem humano</div>
+        <div class="insight-body">Nos não ganhos, 19 leads pediram explicitamente falar com um humano. Forçar esses leads a ficar com bot pode gerar frustração e churn antes mesmo da venda.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-title">4. 17.3% já usam concorrente</div>
+        <div class="insight-body">Leads com concorrente precisam de abordagem consultiva profunda — comparação, diferencial, case. A Sofia não tem essa capacidade hoje.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 16px; margin-bottom: 24px;">
+    <div class="card-title">Condições para Represar com Sucesso</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Condição</th><th>Impacto</th><th>Prioridade</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Cadência de FUP robusta (mín. 5 touchpoints em 10 dias)</td><td>Recuperar os 53.4% sem resposta</td><td><span class="tag tag-red">Crítica</span></td></tr>
+          <tr><td>2</td><td>Handoff imediato quando lead pede humano</td><td>Reter 6.1% que pedem atendente</td><td><span class="tag tag-red">Crítica</span></td></tr>
+          <tr><td>3</td><td>Variação de horário de contato</td><td>Alcançar leads em horários diferentes</td><td><span class="tag tag-amber">Alta</span></td></tr>
+          <tr><td>4</td><td>FUP contextual (retomar dor, case do segmento)</td><td>Aumentar taxa de resposta dos FUPs</td><td><span class="tag tag-amber">Alta</span></td></tr>
+          <tr><td>5</td><td>Detecção de concorrente → abordagem diferenciada</td><td>Converter 17.3% que usam concorrente</td><td><span class="tag tag-blue">Média</span></td></tr>
+          <tr><td>6</td><td>Qualificação de motivação ("por que agora?")</td><td>Conectar emocionalmente</td><td><span class="tag tag-blue">Média</span></td></tr>
+          <tr><td>7</td><td>Envio de mídia (imagens, links de demo)</td><td>Simular experiência do comercial</td><td><span class="tag tag-blue">Média</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: OPORTUNIDADES -->
+<div id="oportunidades" class="tab-content">
+  <div class="section-title">Resumo de Oportunidades e Testes Propostos</div>
+
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">Top 10 Oportunidades de Melhoria</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Sev.</th><th>Oportunidade</th><th>Volume Impactado</th><th>Ação Proposta</th><th>Teste Sugerido</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><span class="tag tag-red">ALTA</span></td>
+            <td><strong>53.4% sem resposta</strong> — Cadência de FUP inexistente nos não ganhos</td>
+            <td>167 leads/mês</td>
+            <td>Implementar cadência de 5+ FUPs em 10 dias com variação de horário e abordagem</td>
+            <td>A/B test: 3 FUPs vs 6 FUPs com mensagens contextuais vs genéricas</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><span class="tag tag-red">ALTA</span></td>
+            <td><strong>Timing "depois/sem tempo"</strong> — 47.3% dos não ganhos</td>
+            <td>148 leads/mês</td>
+            <td>Oferecer agendamento ("Melhor horário para conversar?"), FUP em horário alternativo</td>
+            <td>Testar pergunta de agendamento no primeiro contato vs fluxo atual</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><span class="tag tag-red">ALTA</span></td>
+            <td><strong>Qualificação de motivação</strong> — apenas 36% nos ganhos</td>
+            <td>Todos os leads</td>
+            <td>Adicionar "O que te fez buscar a Anota agora?" como pergunta obrigatória</td>
+            <td>Incluir no prompt e medir impacto na taxa de engajamento</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><span class="tag tag-amber">MÉDIA</span></td>
+            <td><strong>Ausência de mídia</strong> — Comercial usa 45% áudio/vídeo, Sofia 0%</td>
+            <td>Todos os leads</td>
+            <td>Enviar imagens explicativas (prints do sistema, tabela de preços visual, demo cardápio)</td>
+            <td>A/B test: fluxo com 2 imagens estratégicas vs texto puro</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><span class="tag tag-amber">MÉDIA</span></td>
+            <td><strong>Prova social genérica</strong> — Sofia usa cases não personalizados</td>
+            <td>Leads engajados</td>
+            <td>Banco de cases por segmento (pizzaria, hamburgueria, marmitaria, etc.) e por cidade/estado</td>
+            <td>Testar case do mesmo segmento vs case genérico</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><span class="tag tag-amber">MÉDIA</span></td>
+            <td><strong>17.3% mencionam concorrente</strong> — Sem script de contorno</td>
+            <td>54 leads/mês</td>
+            <td>Criar script de comparação: "Entendo que já usa X. A diferença principal é..."</td>
+            <td>Testar abordagem de comparação ativa vs abordagem atual (ignorar concorrente)</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><span class="tag tag-amber">MÉDIA</span></td>
+            <td><strong>Passagem de bastão incompleta (54%)</strong> — Lead não sabe o que esperar</td>
+            <td>Leads convertidos</td>
+            <td>Mensagem padrão pós-pagamento: nome do consultor de ativação, prazo, canal</td>
+            <td>Medir impacto na taxa de ativação 1pdd dos leads convertidos pela Sofia</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><span class="tag tag-blue">BAIXA</span></td>
+            <td><strong>6.1% pedem humano</strong> — Handoff nem sempre disponível</td>
+            <td>19 leads/mês</td>
+            <td>Garantir handoff imediato para leads 400+ que pedem atendente</td>
+            <td>Regra: se lead 400+ pede humano, transbordar em até 5 min</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td><span class="tag tag-blue">BAIXA</span></td>
+            <td><strong>Demo do cardápio</strong> — Comercial mostra em 30.3% dos ganhos</td>
+            <td>Leads com delivery</td>
+            <td>Gerar link de cardápio demo com nome do restaurante e enviar na conversa</td>
+            <td>A/B test: enviar demo personalizado no meio da qualificação</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td><span class="tag tag-blue">BAIXA</span></td>
+            <td><strong>100 leads TRIAL sem conversão</strong> — 65 sem resposta</td>
+            <td>100 leads/mês</td>
+            <td>Reativar leads TRIAL com abordagem diferenciada: "Vi que você testou, como foi?"</td>
+            <td>Testar reativação contextual de trial vs manter como está</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="verdict-box">
+    <h3>Resumo Executivo</h3>
+    <p><strong>Perfil do lead 400+:</strong> Restaurante já em operação (85%), foco delivery ou misto (75%), 100-200+ pedidos/mês, dor clara de organização/atendimento. 56% são P0/P1.</p>
+    <p style="margin-top: 8px;"><strong>O que funciona na Sofia:</strong> Qualificação estruturada (95%+ aderência nos ganhos), fluxo claro até o link de pagamento, capacidade de conduzir lead do zero ao pagamento em 15 mensagens.</p>
+    <p style="margin-top: 8px;"><strong>O que precisa melhorar:</strong> (1) Cadência de FUP robusta para os 53.4% sem resposta; (2) Abordagem de timing para os 47.3% "depois/sem tempo"; (3) Qualificação de motivação (36%); (4) Mídia visual como o comercial; (5) Prova social por segmento.</p>
+    <p style="margin-top: 8px;"><strong>Sobre represamento:</strong> SIM, represar mais faz sentido — mas somente se a Sofia ganhar capacidade de FUP contextual, variação de horário e handoff rápido. Sem isso, represar mais vai apenas atrasar a conversão sem ganho real.</p>
+    <p style="margin-top: 8px;"><strong>Impacto estimado:</strong> Se as 3 ações críticas forem implementadas e recuperarem 10% dos 167 leads sem resposta, são ~17 conversões extras/mês de leads 400+ com alta retenção.</p>
+  </div>
+</div>
+
+<script>
+// Tab logic
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// === DATALABELS PLUGIN (inline) ===
+const datalabelsPlugin = {
+  id: 'customDatalabels',
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((dataset, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (!meta.visible) return;
+      meta.data.forEach((el, i) => {
+        const val = dataset.data[i];
+        if (val === 0 || val === null || val === undefined) return;
+        ctx.save();
+        ctx.font = 'bold 11px -apple-system, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        if (chart.config.type === 'doughnut' || chart.config.type === 'pie') {
+          // Position labels outside the arc
+          const arc = el;
+          const angle = (arc.startAngle + arc.endAngle) / 2;
+          const r = (arc.innerRadius + arc.outerRadius) / 2;
+          const x = arc.x + Math.cos(angle) * r;
+          const y = arc.y + Math.sin(angle) * r;
+          ctx.fillStyle = '#fff';
+          ctx.fillText(val, x, y);
+        } else if (chart.config.type === 'radar') {
+          ctx.fillStyle = '#0F172A';
+          ctx.fillText(val + '%', el.x, el.y - 10);
+        } else if (chart.options.indexAxis === 'y') {
+          // Horizontal bar
+          ctx.fillStyle = '#0F172A';
+          ctx.textAlign = 'left';
+          ctx.fillText(val, el.x + 6, el.y);
+        } else {
+          // Vertical bar
+          ctx.fillStyle = '#0F172A';
+          ctx.fillText(val, el.x, el.y - 8);
+        }
+        ctx.restore();
+      });
+    });
+  }
+};
+Chart.register(datalabelsPlugin);
+
+// Blue palette
+const BLUE = {
+  b900: '#0C1A3A',
+  b800: '#1E3A5F',
+  b700: '#1D4ED8',
+  b600: '#2563EB',
+  b500: '#3B82F6',
+  b400: '#60A5FA',
+  b300: '#93C5FD',
+  b200: '#BFDBFE',
+  b100: '#DBEAFE',
+  b50:  '#EFF6FF',
+};
+
+// Chart defaults
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.position = 'bottom';
+
+// 1. Atribuição dos ganhos que passaram pela Sofia
+new Chart(document.getElementById('chartAtribuicao'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Comercial (SF Inbound)', 'Self/Outros', 'Sofia Direta'],
+    datasets: [{
+      data: [110, 129, 39],
+      backgroundColor: [BLUE.b700, BLUE.b400, BLUE.b200],
+      borderWidth: 2,
+      borderColor: '#fff',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 12 } },
+      tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} (${(ctx.raw/278*100).toFixed(1)}%)` } }
+    }
+  }
+});
+
+// 2. Atribuição geral junho
+new Chart(document.getElementById('chartAtribuicaoGeral'), {
+  type: 'doughnut',
+  data: {
+    labels: ['SF INBOUND', 'LP SELF CHECKOUT', 'SELF ADMIN', 'SELF CHECKOUT SOFIA', 'Outros'],
+    datasets: [{
+      data: [176, 66, 44, 25, 17],
+      backgroundColor: [BLUE.b900, BLUE.b700, BLUE.b500, BLUE.b300, BLUE.b100],
+      borderWidth: 2,
+      borderColor: '#fff',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } },
+    }
+  }
+});
+
+// 3. Razões de não conversão
+new Chart(document.getElementById('chartRazoes'), {
+  type: 'bar',
+  data: {
+    labels: ['Sem Resposta', 'Timing (depois/sem tempo)', 'Usa Concorrente', 'Engajou mas não converteu', 'Pediu Humano', 'Objeção Preço', 'Sem Fit', 'Abandonou Cedo'],
+    datasets: [{
+      data: [167, 148, 54, 20, 19, 10, 10, 8],
+      backgroundColor: [BLUE.b700, BLUE.b600, BLUE.b500, BLUE.b400, BLUE.b400, BLUE.b300, BLUE.b300, BLUE.b200],
+      borderWidth: 0,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, max: 200 },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// 4. Engajamento
+new Chart(document.getElementById('chartEngajamento'), {
+  type: 'bar',
+  data: {
+    labels: ['Msgs Total', 'Msgs Sofia', 'Msgs Lead', 'Respondeu (%)', 'Engajou 3+ (%)'],
+    datasets: [
+      { label: 'Ganhos', data: [16.1, 8.8, 7.3, 66.5, 53.2], backgroundColor: BLUE.b700, borderRadius: 4 },
+      { label: 'Não Ganhos', data: [7.9, 5.0, 2.9, 46.6, 29.4], backgroundColor: BLUE.b300, borderRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#D6E0ED' } }
+    }
+  }
+});
+
+// 5. Objeções
+new Chart(document.getElementById('chartObjecoes'), {
+  type: 'radar',
+  data: {
+    labels: ['Timing', 'Info/Dúvida', 'Concorrente', 'Handoff', 'Preço', 'Sem Fit'],
+    datasets: [
+      { label: 'Ganhos', data: [50.0, 51.4, 23.0, 26.6, 9.4, 4.7], borderColor: BLUE.b700, backgroundColor: 'rgba(29,78,216,.12)', pointBackgroundColor: BLUE.b700, borderWidth: 2 },
+      { label: 'Não Ganhos', data: [47.3, 35.5, 17.6, 6.1, 3.8, 3.2], borderColor: BLUE.b300, backgroundColor: 'rgba(147,197,253,.15)', pointBackgroundColor: BLUE.b300, borderWidth: 2 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: { r: { beginAtZero: true, max: 60, grid: { color: '#D6E0ED' } } }
+  }
+});
+
+// 6. Playbook
+new Chart(document.getElementById('chartPlaybook'), {
+  type: 'bar',
+  data: {
+    labels: ['Qual. Tempo', 'Qual. Formato', 'Qual. Volume', 'Qual. Dor', 'Qual. Ferramenta', 'Qual. Motivação', 'Funcionalidades', 'POL', 'Proposta Valor', 'Promoção', 'Fechamento', 'Passagem Bastão'],
+    datasets: [
+      { label: 'Ganhos via Sofia', data: [85, 95, 100, 95, 97, 36, 95, 97, 97, 97, 100, 54], backgroundColor: BLUE.b700, borderRadius: 4 },
+      { label: 'Não Ganhos', data: [29, 36, 26, 27, 72, 34, 31, 23, 24, 20, 20, 14], backgroundColor: BLUE.b200, borderRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 45 } },
+      y: { grid: { color: '#D6E0ED' }, max: 110, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// 7. Técnicas comercial
+new Chart(document.getElementById('chartTecnicas'), {
+  type: 'bar',
+  data: {
+    labels: ['Áudio/Vídeo', 'Demo Cardápio', 'Prova Social', 'Ativação', 'Ligação', 'Cashback/POL'],
+    datasets: [{
+      data: [45.1, 30.3, 15.5, 10.2, 7.6, 6.4],
+      backgroundColor: [BLUE.b700, BLUE.b600, BLUE.b500, BLUE.b400, BLUE.b300, BLUE.b200],
+      borderWidth: 0,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#D6E0ED' }, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// 8. Tipos conteúdo
+new Chart(document.getElementById('chartTipos'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Texto', 'Áudio', 'Imagem', 'Vídeo', 'Outros'],
+    datasets: [{
+      data: [672, 206, 46, 12, 11],
+      backgroundColor: [BLUE.b700, BLUE.b500, BLUE.b400, BLUE.b300, BLUE.b200],
+      borderWidth: 2,
+      borderColor: '#fff',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
+// 9. Temas comercial
+new Chart(document.getElementById('chartTemas'), {
+  type: 'bar',
+  data: {
+    labels: ['Robô/IA', 'Pedidos', 'Cardápio', 'Plano', 'Delivery', 'Pagamento', 'Preço', 'Suporte', 'Salão', 'Trial', 'Vídeo Demo'],
+    datasets: [{
+      data: [148, 111, 107, 81, 66, 63, 55, 43, 37, 25, 15],
+      backgroundColor: BLUE.b600,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
